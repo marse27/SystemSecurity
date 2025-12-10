@@ -1,0 +1,5 @@
+# Ignore generated policy file
+policy.txt
+
+# Ignore compiled tracer
+tracer
