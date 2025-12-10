@@ -77,6 +77,7 @@ static void trace_once(char *prog, char **args, int *seen, FILE *policy) {
 }
 
 int main(int argc, char *argv[]) {
+    (void)argc;
 
     FILE *policy = fopen("policy.txt", "w");
     if (!policy) {
@@ -92,7 +93,7 @@ int main(int argc, char *argv[]) {
     fprintf(policy, "Unique syscalls across %d runs (also in policy.txt):\n", RUNS);
     for (int i = 0; i < MAX_SYSCALL; i++) {
         if (seen[i]) {
-            fprintf(policy, "%ld\n", i);
+            fprintf(policy, "%d\n", i);
         }
     }
 
