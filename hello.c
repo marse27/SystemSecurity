@@ -1,4 +1,4 @@
-// hello.c - test multiple syscalls with raw syscalls
+// hello.c - test with unauthorized syscall
 long raw_syscall(long n, long a1, long a2, long a3, long a4, long a5, long a6) {
     long ret;
     register long r10 asm("r10") = a4;
@@ -9,23 +9,21 @@ long raw_syscall(long n, long a1, long a2, long a3, long a4, long a5, long a6) {
 }
 
 void _start() {
-    // Syscall 1: write
+    // Syscall 1: write (ALLOWED - in policy)
     const char msg1[] = "Hello World!\n";
     raw_syscall(1, 1, (long)msg1, sizeof(msg1) - 1, 0, 0, 0);
     
-    // Syscall 9: mmap
-    raw_syscall(9, 0, 4096, 3, 34, -1, 0);  // PROT_READ|WRITE, MAP_PRIVATE|ANON
+    // ⚠️ ATTACKER CODE: Syscall 102 (getuid) - NOT IN POLICY!
+    const char attack_msg[] = "Attempting unauthorized syscall 102 (getuid)...\n";
+    raw_syscall(1, 1, (long)attack_msg, sizeof(attack_msg) - 1, 0, 0, 0);
+    raw_syscall(102, 0, 0, 0, 0, 0, 0);  // getuid - NOT ALLOWED!
     
-    // Syscall 39: getpid
-    raw_syscall(39, 0, 0, 0, 0, 0, 0);
-    
-    // Syscall 2: open (will fail but that's ok)
-    const char file[] = "/tmp/test";
-    raw_syscall(2, (long)file, 0, 0, 0, 0, 0);
+    // Should NEVER reach here if sandbox works!
+    const char failure_msg[] = "❌ SANDBOX FAILED! This should not print!\n";
+    raw_syscall(1, 1, (long)failure_msg, sizeof(failure_msg) - 1, 0, 0, 0);
     
     const char msg2[] = "Done!\n";
     raw_syscall(1, 1, (long)msg2, sizeof(msg2) - 1, 0, 0, 0);
     
-    // Syscall 60: exit
-    raw_syscall(60, 0, 0, 0, 0, 0, 0);
+    raw_syscall(60, 0, 0, 0, 0, 0, 0);  // exit
 }
