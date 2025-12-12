@@ -1,10 +1,3 @@
-To compile the tracer, run:
+# CS4150 Systems Security - Group 10
 
-```bash
-gcc -Wall -Wextra -std=c11 tracer.c -o tracer
-```
-
-Then execute the tracer on /bin/ls to record its system calls:
-```bash
-./tracer /bin/ls
-```
+### [Assignment 1](assignment-1/README.md)

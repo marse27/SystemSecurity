@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 #define MAX_SYSCALL 1024
-#define RUNS 1
+#define RUNS 3
 
 static void end_program(const char *msg) {
     perror(msg);
@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
         trace_once(argv[1], &argv[1], seen, policy);
     }
 
-    fprintf(policy, "Unique syscalls across %d runs (also in policy.txt):\n", RUNS);
+    // fprintf(policy, "Unique syscalls across %d runs (also in policy.txt):\n", RUNS);
     for (int i = 0; i < MAX_SYSCALL; i++) {
         if (seen[i]) {
             fprintf(policy, "%d\n", i);
