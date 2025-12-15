@@ -15,7 +15,11 @@ static void end_program(const char *msg) {
     exit(1);
 }
 
-static void trace_once(char *prog, char **args, int *seen, FILE *policy) {
+static void trace_once(char *prog, char **args, int *seen, FILE *policy, int run_idx)
+ {
+    fprintf(stderr, "\n========== RUN %d/%d ==========\n", run_idx + 1, RUNS);
+    fflush(stderr);
+
     pid_t child = fork();
     if (child == -1) {
         end_program("fork");
@@ -63,6 +67,9 @@ static void trace_once(char *prog, char **args, int *seen, FILE *policy) {
         if (!syscall) {
             long sc = regs.orig_rax;
 
+            printf("syscall: %ld\n", sc);
+            fflush(stdout); 
+
             if (sc >= 0 && sc < MAX_SYSCALL) {
                 if (!seen[sc]) {
                     seen[sc] = 1;
@@ -87,10 +94,9 @@ int main(int argc, char *argv[]) {
     int seen[MAX_SYSCALL] = {0};
 
     for (int i = 0; i < RUNS; i++) {
-        trace_once(argv[1], &argv[1], seen, policy);
+        trace_once(argv[1], &argv[1], seen, policy, i);
     }
 
-    // fprintf(policy, "Unique syscalls across %d runs (also in policy.txt):\n", RUNS);
     for (int i = 0; i < MAX_SYSCALL; i++) {
         if (seen[i]) {
             fprintf(policy, "%d\n", i);
