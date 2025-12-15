@@ -16,6 +16,7 @@ Trace system calls of `/bin/ls` using ptrace and record the union of syscalls ac
 ### How to run
 ```bash
 cd assignment-1
+chmod +x part1.sh
 ./part1.sh
 ```
 
@@ -38,6 +39,7 @@ Sandbox implementation using Syscall User Dispatch (SUD). The sandbox is initial
 ### How to run
 ```bash
 cd assignment-1
+chmod +x part1.sh
 ./part2.sh
 ```
 
