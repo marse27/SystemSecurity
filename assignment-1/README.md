@@ -20,6 +20,14 @@ chmod +x part1.sh
 ./part1.sh
 ```
 
+For WSL / Windows users:
+```bash
+cd assignment-1
+sed -i 's/\r$//' part1.sh
+chmod +x part1.sh
+./part1.sh
+```
+
 ---
 
 ## Part 2: Enforce a System Call Policy
@@ -39,6 +47,14 @@ Sandbox implementation using Syscall User Dispatch (SUD). The sandbox is initial
 ### How to run
 ```bash
 cd assignment-1
+chmod +x part2.sh
+./part2.sh
+```
+
+For WSL / Windows users:
+```bash
+cd assignment-1
+sed -i 's/\r$//' part2.sh
 chmod +x part2.sh
 ./part2.sh
 ```
