@@ -101,7 +101,7 @@ static void sud_setup() {
     printf("Dispatcher: %p - %p (%ld bytes)\n", 
            start, end, (long)((char*)end - (char*)start));
     
-    if (prctl(PR_SET_SYSCALL_USER_DISPATCH, PR_SYS_DISPATCH_EXCLUSIVE_ON,
+    if (prctl(PR_SET_SYSCALL_USER_DISPATCH, PR_SYS_DISPATCH_ON,
               start, (size_t)((char*)end - (char*)start + 1), 
               &sud_selector) < 0) {
         perror("prctl");
