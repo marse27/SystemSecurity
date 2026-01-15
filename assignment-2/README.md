@@ -1,69 +1,46 @@
-# Assignment 1
+# Assignment 2
 
-## Part 1: Identify Required System Calls
+## Part 1 – Block (some) attacks that bypass the W^X policy
 
-Trace system calls of `/bin/ls` using ptrace and record the union of syscalls across multiple runs.
+Extend the Syscall User Dispatch (SUD) sandbox from Assignment 1 to block dangerous syscall argument combinations that can bypass a W^X policy.
 
 ### What it does
-- Runs the tracer on `/bin/ls` 3 times
-- Records all unique system calls made
-- Outputs the union of syscalls to `policy.txt`
+- Builds the tracer, sandbox, and the two attacker test programs
+- Runs the tracer on `test1` 3 times to generate a syscall allowlist policy (`policy_test1.txt`)
+- Runs `test1` under the sandbox (`LD_PRELOAD`) and blocks the W^X bypass by denying `mprotect()` when it requests `PROT_WRITE | PROT_EXEC`
+- Runs the tracer on `test2` 3 times to generate a syscall allowlist policy (`policy_test2.txt`)
+- Runs `test2` under the sandbox (`LD_PRELOAD`) and blocks the `/proc/self/mem` abuse by denying `open/openat()` when opening `/proc/self/mem` with writable access
 
 ### Files
-- `tracer.c` - ptrace-based syscall tracer
-- `policy.txt` - Generated syscall policy file
+- `test1.cpp` - Simulates an attacker that bypasses W^X using mprotect(PROT_EXEC | PROT_WRITE)
+- `test2.cpp` - Simulates an attacker that abuses `/proc/self/mem` by opening it with O_RDWR
 
 ### How to run
 ```bash
-cd assignment-1
+cd assignment-2
 chmod +x part1.sh
 ./part1.sh
 ```
 
 For WSL / Windows users:
 ```bash
-cd assignment-1
+cd assignment-2
 sed -i 's/\r$//' part1.sh
 chmod +x part1.sh
 ./part1.sh
 ```
 
+### Expected output
+
+#### test1
+The sandbox denies mprotect() when it tries to create writable + executable memory and the program prints:
+`Succeeded to mitigate the attacker`
+
+#### test2
+The sandbox denies opening `/proc/self/mem` with write permissions and the program prints:
+`Failed to open /proc/self/mem ... attacker blocked :) !!!`
+
 ---
 
-## Part 2: Enforce a System Call Policy
+## Part 2 – Code Scanner
 
-Sandbox implementation using Syscall User Dispatch (SUD). The sandbox is initialized via `prctl()`, compiled as a shared library, and loaded into the target application using `LD_PRELOAD`.
-
-### What it does
-1. Runs tracer on a simple program that prints "Hello World" to get its allowed syscalls
-2. Creates a malicious version that calls `getpid()` (which it shouldn't need)
-3. Loads the sandbox and blocks the unauthorized syscall
-
-### Files
-- `hello.c` - Print "Hello World"
-- `hello_malicious.c` - Print "Hello World" + `getpid()`
-- `sandbox.c` - Sandbox with Syscall User Dispatch
-
-### How to run
-```bash
-cd assignment-1
-chmod +x part2.sh
-./part2.sh
-```
-
-For WSL / Windows users:
-```bash
-cd assignment-1
-sed -i 's/\r$//' part2.sh
-chmod +x part2.sh
-./part2.sh
-```
-
-### Expected output
-The sandbox will intercept the `getpid()` syscall and terminate the malicious program:
-```
-SYSCALL: 1
-Hello World!
-SYSCALL: 39
-BLOCKED SYSCALL: 39 - TERMINATING!
-```

@@ -6,3 +6,13 @@ assignment-1/tracer
 assignment-1/hello
 assignment-1/hello_malicious
 assignment-1/sandbox.so
+
+# Ignore compiled files for the second assignment
+assignment-2/policy_test1.txt
+assignment-2/policy_test2.txt
+assignment-2/tracer
+assignment-2/hello
+assignment-2/hello_malicious
+assignment-2/sandbox.so
+assignment-2/test1
+assignment-2/test2

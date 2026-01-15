@@ -5,6 +5,11 @@
 #include <stdlib.h>
 #include <ucontext.h>
 #include <unistd.h>
+#include <errno.h>
+#include <string.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/syscall.h>
 
 #define MAX_SYSCALL 512
 
@@ -29,6 +34,27 @@ static void load_policy(const char *filename) {
     printf("\nLoaded %d syscalls\n", count);
 }
 
+static int prot_is_wx(long prot) {
+    return ((prot & PROT_WRITE) && (prot & PROT_EXEC));
+}
+
+static int flags_is_writeable(long flags) {
+    return ((flags & O_ACCMODE) != O_RDONLY);
+}
+
+#define RETURN_FROM_HANDLER()                         \
+    do {                                              \
+        sud_selector = SYSCALL_DISPATCH_FILTER_BLOCK; \
+        __asm__ volatile (                            \
+            "movq $15, %%rax\n\t"                     \
+            "leaveq\n\t"                              \
+            "add $8, %%rsp\n\t"                       \
+            "jmp syscall_dispatcher_start\n\t"        \
+            ::: "memory"                              \
+        );                                            \
+    } while (0)
+
+
 static void sigsys_handler(int sig, siginfo_t *info, void *ucontext) {
     (void)sig;
 
@@ -36,11 +62,46 @@ static void sigsys_handler(int sig, siginfo_t *info, void *ucontext) {
     
     ucontext_t *ctx = (ucontext_t *)ucontext;
     int sc = info->si_syscall;
-    
+
+    long a1 = ctx->uc_mcontext.gregs[REG_RDI];
+    long a2 = ctx->uc_mcontext.gregs[REG_RSI];
+    long a3 = ctx->uc_mcontext.gregs[REG_RDX];
+    long a4 = ctx->uc_mcontext.gregs[REG_R10];
+    long a5 = ctx->uc_mcontext.gregs[REG_R8];
+    long a6 = ctx->uc_mcontext.gregs[REG_R9];
+
     char buf[64];
     int len = snprintf(buf, sizeof(buf), "SYSCALL: %d\n", sc);
     write(STDERR_FILENO, buf, len);
     
+    if (sc == __NR_mprotect) {
+        long prot = a3;
+        if (prot_is_wx(prot)) {
+            ctx->uc_mcontext.gregs[REG_RAX] = -EPERM;
+            RETURN_FROM_HANDLER();
+        }
+    }
+
+    if (sc == __NR_open) {
+        const char *path = (const char *)a1;
+        long flags = a2;
+
+        if (path && strcmp(path, "/proc/self/mem") == 0 && flags_is_writeable(flags)) {
+            ctx->uc_mcontext.gregs[REG_RAX] = -EACCES;
+            RETURN_FROM_HANDLER();
+        }
+    }
+
+    if (sc == __NR_openat) {
+        const char *path = (const char *)a2;
+        long flags = a3;
+
+        if (path && strcmp(path, "/proc/self/mem") == 0 && flags_is_writeable(flags)) {
+            ctx->uc_mcontext.gregs[REG_RAX] = -EACCES;
+            RETURN_FROM_HANDLER();
+        }
+    }
+
     // Policy check
     if (!allowed_syscalls[sc]) {
         char msg[64];
@@ -50,15 +111,7 @@ static void sigsys_handler(int sig, siginfo_t *info, void *ucontext) {
     }
     
     // Execute the syscall
-    long result = syscall(
-        sc,
-        ctx->uc_mcontext.gregs[REG_RDI],
-        ctx->uc_mcontext.gregs[REG_RSI],
-        ctx->uc_mcontext.gregs[REG_RDX],
-        ctx->uc_mcontext.gregs[REG_R10],
-        ctx->uc_mcontext.gregs[REG_R8],
-        ctx->uc_mcontext.gregs[REG_R9]
-    );
+    long result = syscall(sc, a1, a2, a3, a4, a5, a6);
     
     ctx->uc_mcontext.gregs[REG_RAX] = result;
     
