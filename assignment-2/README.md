@@ -44,3 +44,29 @@ The sandbox denies opening `/proc/self/mem` with write permissions and the progr
 
 ## Part 2 – Code Scanner
 
+Built a code scanner that identifies all syscall instructions in executable memory regions of a running program. 
+
+### What it does
+- Scans executable memory regions by parsing `/proc/self/maps`
+- Identifies all syscall instructions (`0x0F 0x05` opcode) in x86-64 binaries
+- Reports the virtual address and memory region of each syscall found
+- Loads as a shared library using `LD_PRELOAD` and runs before the target program starts
+- Works with any Linux x86-64 application (tested with `/bin/ls`, `/bin/echo`, `/bin/cat`)
+
+### Files
+- `syscall_scanner.c` - Main scanner implementation with constructor function
+- `pmparser.c` - Library to parse `/proc/self/maps` (from https://github.com/ouadev/proc_maps_parser)
+- `pmparser.h` - Header file for the proc maps parser
+- `Makefile` - Build configuration for the shared library
+- `REPORT.md` - Detailed report with implementation details, screenshots, and analysis
+
+### How to build
+```bash
+cd assignment-2/part2-code-scanner
+
+# Download the proc_maps_parser library
+wget https://raw.githubusercontent.com/ouadev/proc_maps_parser/master/pmparser.c
+wget https://raw.githubusercontent.com/ouadev/proc_maps_parser/master/include/pmparser.h
+
+# Build the scanner
+make

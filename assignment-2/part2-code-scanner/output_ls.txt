@@ -1,0 +1,71 @@
+scanning for syscall instr
+scanning region:  /usr/bin/ls
+address range: 0xaaaad2580000 - 0xaaaad259d000
+size: 118784 bytes
+permissions: r-xp
+syscall found at address: 0xaaaad2593235
+total syscalls found in this region: 1
+
+scanning region:  /usr/lib/aarch64-linux-gnu/libpcre2-8.so.0.10.4
+address range: 0xffffb4ab0000 - 0xffffb4b30000
+size: 524288 bytes
+permissions: r-xp
+syscall found at address: 0xffffb4af5415
+syscall found at address: 0xffffb4b2b188
+total syscalls found in this region: 2
+
+scanning region:  /usr/lib/aarch64-linux-gnu/libc.so.6
+address range: 0xffffb4b50000 - 0xffffb4cde000
+size: 1630208 bytes
+permissions: r-xp
+syscall found at address: 0xffffb4b51218
+syscall found at address: 0xffffb4b55b80
+syscall found at address: 0xffffb4b5b7c9
+syscall found at address: 0xffffb4b5c591
+syscall found at address: 0xffffb4b5f639
+syscall found at address: 0xffffb4b5fb91
+syscall found at address: 0xffffb4b88325
+syscall found at address: 0xffffb4c0d35d
+syscall found at address: 0xffffb4c166a4
+syscall found at address: 0xffffb4c20eed
+syscall found at address: 0xffffb4c9917c
+syscall found at address: 0xffffb4c9c21b
+syscall found at address: 0xffffb4c9eb40
+syscall found at address: 0xffffb4cd9ab0
+total syscalls found in this region: 14
+
+scanning region:  /usr/lib/aarch64-linux-gnu/libselinux.so.1
+address range: 0xffffb4d00000 - 0xffffb4d26000
+size: 155648 bytes
+permissions: r-xp
+total syscalls found in this region: 0
+
+scanning region:  /home/ubuntu/SystemSecurity/assignment-2/part2-code-scanner/libsyscall_scanner.so
+address range: 0xffffb4d50000 - 0xffffb4d52000
+size: 8192 bytes
+permissions: r-xp
+total syscalls found in this region: 0
+
+scanning region:  /usr/lib/aarch64-linux-gnu/ld-linux-aarch64.so.1
+address range: 0xffffb4d6b000 - 0xffffb4d96000
+size: 176128 bytes
+permissions: r-xp
+syscall found at address: 0xffffb4d72c21
+syscall found at address: 0xffffb4d749f1
+syscall found at address: 0xffffb4d81bd1
+total syscalls found in this region: 3
+
+scanning region:  [vdso]
+address range: 0xffffb4da4000 - 0xffffb4da5000
+size: 4096 bytes
+permissions: r-xp
+syscall found at address: 0xffffb4da42a1
+total syscalls found in this region: 1
+scan complete
+total regions scanned: 7
+Makefile
+libsyscall_scanner.so
+output_ls.txt
+pmparser.c
+pmparser.h
+syscall_scanner.c

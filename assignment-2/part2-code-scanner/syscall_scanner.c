@@ -12,12 +12,12 @@ void scan_region(procmaps_struct* map) {
     unsigned char* start = (unsigned char*)map->addr_start;
     unsigned char* end = (unsigned char*)map->addr_end;
     size_t region_size = map->length;
-    const char* pathname = map->pathname ? map->pathname : "[anonymous]";
+    const char* pathname = map->pathname ? map->pathname : "anonymous";
     
-    printf("\n[*] Scanning region:  %s\n", pathname);
-    printf("    Address range: %p - %p\n", start, end);
-    printf("    Size: %zu bytes\n", region_size);
-    printf("    Permissions: %c%c%c%c\n", 
+    printf("\nscanning region:  %s\n", pathname);
+    printf("address range: %p - %p\n", start, end);
+    printf("size: %zu bytes\n", region_size);
+    printf("permissions: %c%c%c%c\n", 
            map->is_r ?  'r' : '-',
            map->is_w ? 'w' : '-',
            map->is_x ? 'x' :  '-',
